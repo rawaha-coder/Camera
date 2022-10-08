@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.hybcode.camera.MainActivity
@@ -26,7 +27,8 @@ class GalleryAdapter(private val activity: MainActivity, private val fragment: G
             }
         }
         override fun onClick(view: View) {
-// TODO: Navigate to the photo filter fragment
+            val action = GalleryFragmentDirections.actionPhotoFilter(photos[layoutPosition])
+            view.findNavController().navigate(action)
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
