@@ -4,18 +4,23 @@ import android.Manifest
 import android.app.Activity
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.hybcode.camera.databinding.ActivityMainBinding
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,8 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = binding.navView
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
 
+        val navController = navHostFragment.navController
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_camera, R.id.navigation_gallery
@@ -86,6 +93,21 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, imageFileName)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
             put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM")
+        }
+    }
+
+    fun saveImage(bitmap: Bitmap) {
+        val resolver = applicationContext.contentResolver
+        val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, prepareContentValues())
+        try {
+            val fos = imageUri?.let { resolver.openOutputStream(it) }
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos?.close()
+            Toast.makeText(this, resources.getString(R.string.photo_saved), Toast.LENGTH_LONG).show()
+        } catch (e: FileNotFoundException) {
+            Toast.makeText(this, resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
+        } catch (e: IOException) {
+            Toast.makeText(this, resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
         }
     }
 
