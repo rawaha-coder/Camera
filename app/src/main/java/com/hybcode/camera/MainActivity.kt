@@ -2,8 +2,10 @@ package com.hybcode.camera
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +16,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.hybcode.camera.databinding.ActivityMainBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,4 +78,15 @@ class MainActivity : AppCompatActivity() {
             CameraPermissionHelper.requestPermissions(this)
         } else recreate()
     }
+
+    fun prepareContentValues(): ContentValues {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "image_$timeStamp"
+        return ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, imageFileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM")
+        }
+    }
+
 }
